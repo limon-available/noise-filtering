@@ -13,6 +13,7 @@ from utils import (
     display_image_with_title,
     display_image_with_metrics,
     display_image_with_histogram,
+    display_image_with_metrics_and_histogram,
 )
 
 # --- Page Configuration ---
@@ -277,13 +278,15 @@ else:
             st.markdown(f"**Filtered Images — {filter_type.capitalize()} Filter**")
             num_filtered = len(filtered_images) - 1
 
+            metrics_fn = display_image_with_metrics_and_histogram if show_histograms else display_image_with_metrics
+
             for row_start in range(0, num_filtered, 5):
                 row_end = min(row_start + 5, num_filtered)
                 cols = st.columns(5)
 
                 for j in range(row_start, row_end):
                     img_idx = j + 1
-                    display_image_with_metrics(
+                    metrics_fn(
                         filtered_images[img_idx],
                         f"Filter-{img_idx}",
                         cols[j - row_start],

@@ -47,6 +47,25 @@ def display_image_with_metrics(image: np.ndarray, title: str, col, psnr: float =
         )
 
 
+def display_image_with_metrics_and_histogram(
+    image: np.ndarray, title: str, col, psnr: float = None, snr: float = None
+):
+    """Display an image with title, PSNR/SNR metrics, and RGB histogram below."""
+    col.image(image, use_container_width=True)
+    col.markdown(
+        f"<p style='text-align: center; font-weight: bold; font-size: 15px;'>{title}</p>",
+        unsafe_allow_html=True,
+    )
+    if psnr is not None and snr is not None:
+        col.markdown(
+            f"<p style='text-align: center; font-size: 13px; color: #2c3e50;'>"
+            f"PSNR: {psnr:.2f} dB &nbsp;|&nbsp; SNR: {snr:.2f} dB</p>",
+            unsafe_allow_html=True,
+        )
+    hist_img = plot_histogram(image, f"{title} Histogram")
+    col.image(hist_img, use_container_width=True)
+
+
 def image_to_bytes(image: np.ndarray, fmt: str = "png") -> bytes:
     """Convert a NumPy image array to bytes for download."""
     success, buffer = cv2.imencode(f".{fmt}", cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
