@@ -207,7 +207,17 @@ with tab2:
             st.markdown('<div class="sidebar-header">🔧 Filter</div>', unsafe_allow_html=True)
             filter_type = st.radio(
                 "Select filter",
-                options=["gaussian", "median", "bilateral"],
+                options=[
+                    "gaussian",
+                    "median",
+                    "bilateral",
+                    "box",
+                    "weighted_smoothing",
+                    "sobel",
+                    "laplacian",
+                    "unsharp_masking",
+                    "high_boost",
+                ],
                 index=0,
                 label_visibility="collapsed",
                 key="filter_type",

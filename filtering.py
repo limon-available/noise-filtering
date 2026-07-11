@@ -1,6 +1,16 @@
 import numpy as np
 
-from filters import gaussian_filter, median_filter, bilateral_filter
+from filters import (
+    gaussian_filter,
+    median_filter,
+    bilateral_filter,
+    box_filter,
+    weighted_smoothing_filter,
+    sobel_filter,
+    laplacian_filter,
+    unsharp_masking,
+    high_boost_filter,
+)
 from metrics import calculate_psnr, calculate_snr
 
 
@@ -20,7 +30,9 @@ def analyze_filter(
     noisy : np.ndarray
         The noisy image to be filtered.
     filter_name : str
-        One of "gaussian", "median", or "bilateral".
+        One of: "gaussian", "median", "bilateral", "box",
+                "weighted_smoothing", "sobel", "laplacian",
+                "unsharp_masking", "high_boost".
     iterations : int
         Number of filtering iterations (default 5).
 
@@ -28,13 +40,10 @@ def analyze_filter(
     -------
     images : list[np.ndarray]
         List of [noisy, filtered_1, filtered_2, ..., filtered_N].
-        Each element is the image after that many filter applications.
     psnr_values : list[float]
         PSNR (dB) of each filtered image compared to the original.
-        Length = iterations (one value per iteration).
     snr_values : list[float]
         SNR (dB) of each filtered image compared to the original.
-        Length = iterations (one value per iteration).
     """
     images = [noisy]
     psnr_values = []
@@ -42,15 +51,26 @@ def analyze_filter(
 
     current = noisy.copy()
 
+    filter_map = {
+        "gaussian": gaussian_filter,
+        "median": median_filter,
+        "bilateral": bilateral_filter,
+        "box": box_filter,
+        "weighted_smoothing": weighted_smoothing_filter,
+        "sobel": sobel_filter,
+        "laplacian": laplacian_filter,
+        "unsharp_masking": unsharp_masking,
+        "high_boost": high_boost_filter,
+    }
+
+    if filter_name not in filter_map:
+        valid = ", ".join(filter_map.keys())
+        raise ValueError(f"Unknown filter: '{filter_name}'. Valid options: {valid}")
+
+    filter_fn = filter_map[filter_name]
+
     for i in range(iterations):
-        if filter_name == "gaussian":
-            current = gaussian_filter(current)
-        elif filter_name == "median":
-            current = median_filter(current)
-        elif filter_name == "bilateral":
-            current = bilateral_filter(current)
-        else:
-            raise ValueError(f"Unknown filter: '{filter_name}'. Use 'gaussian', 'median', or 'bilateral'.")
+        current = filter_fn(current)
 
         images.append(current.copy())
 
