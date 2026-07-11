@@ -92,7 +92,7 @@ with st.sidebar:
             key="global_uploader",
         )
         if uploaded_file is None:
-            st.info("ℹ️ Using default **image.jpeg**")
+            st.info("ℹ️ Using default **image.jpg**")
         else:
             st.success(f"✅ **{uploaded_file.name}**")
 

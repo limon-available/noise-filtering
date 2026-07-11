@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Read image
-image = cv2.imread("image.jpeg")
+image = cv2.imread("image.jpg")
 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 # Gaussian Noise

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # ==========================
 # Read Image
 # ==========================
-image = cv2.imread("image.jpeg")
+image = cv2.imread("image.jpg")
 
 if image is None:
     print("Image not found!")

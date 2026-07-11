@@ -7,7 +7,7 @@ import streamlit as st
 
 
 def load_image(uploaded_file) -> np.ndarray | None:
-    """Load image from uploaded file or fallback to image.jpeg."""
+    """Load image from uploaded file or fallback to image.jpg."""
     if uploaded_file is not None:
         file_bytes = np.frombuffer(uploaded_file.read(), np.uint8)
         image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
@@ -16,7 +16,7 @@ def load_image(uploaded_file) -> np.ndarray | None:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         return image
     else:
-        image = cv2.imread("image.jpeg")
+        image = cv2.imread("image.jpg")
         if image is None:
             return None
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
