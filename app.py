@@ -92,7 +92,7 @@ st.markdown(
 )
 
 # ─────────────────────────────────────────────────────────
-# SIDEBAR — Shared Controls
+# SIDEBAR — Shared Controls Only
 # ─────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown(
@@ -152,8 +152,9 @@ tab1, tab2 = st.tabs(["🎨 Noise Generation", "🔬 Filtering Analysis"])
 # TAB 1 — Noise Generation
 # =====================================================================
 with tab1:
-    with st.sidebar:
-        st.markdown("---")
+    col_ctrl, col_display = st.columns([1, 3])
+
+    with col_ctrl:
         with st.container(border=True):
             st.markdown('<div class="sidebar-header">🎯 Noise Type</div>', unsafe_allow_html=True)
             noise_option = st.radio(
@@ -164,52 +165,54 @@ with tab1:
                 key="noise_option",
             )
 
-    with st.spinner("Generating noise..."):
-        gaussian_img = add_gaussian_noise(image)
-        sp_img = add_salt_pepper_noise(image)
-        speckle_img = add_speckle_noise(image)
-        poisson_img = add_poisson_noise(image)
+    with col_display:
+        with st.spinner("Generating noise..."):
+            gaussian_img = add_gaussian_noise(image)
+            sp_img = add_salt_pepper_noise(image)
+            speckle_img = add_speckle_noise(image)
+            poisson_img = add_poisson_noise(image)
 
-    st.markdown('<div class="section-header">📸 Results</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header">📸 Results</div>', unsafe_allow_html=True)
 
-    display_fn = display_image_with_histogram if show_histograms else display_image_with_title
+        display_fn = display_image_with_histogram if show_histograms else display_image_with_title
 
-    if noise_option == "Show All":
-        with st.container(border=True):
-            st.markdown("**Row 1 — Original & Two Noise Types**")
-            col1, col2, col3 = st.columns(3)
-            display_fn(image, "🟢 Original", col1)
-            display_fn(gaussian_img, "🌫️ Gaussian", col2)
-            display_fn(sp_img, "🧂 Salt & Pepper", col3)
+        if noise_option == "Show All":
+            with st.container(border=True):
+                st.markdown("**Row 1 — Original & Two Noise Types**")
+                col1, col2, col3 = st.columns(3)
+                display_fn(image, "🟢 Original", col1)
+                display_fn(gaussian_img, "🌫️ Gaussian", col2)
+                display_fn(sp_img, "🧂 Salt & Pepper", col3)
 
-        st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
 
-        with st.container(border=True):
-            st.markdown("**Row 2 — Two Noise Types**")
-            col4, col5 = st.columns(2)
-            display_fn(speckle_img, "✨ Speckle", col4)
-            display_fn(poisson_img, "📊 Poisson", col5)
+            with st.container(border=True):
+                st.markdown("**Row 2 — Two Noise Types**")
+                col4, col5 = st.columns(2)
+                display_fn(speckle_img, "✨ Speckle", col4)
+                display_fn(poisson_img, "📊 Poisson", col5)
 
-    else:
-        with st.container(border=True):
-            col1, col2 = st.columns(2)
-            display_fn(image, "🟢 Original", col1)
+        else:
+            with st.container(border=True):
+                col1, col2 = st.columns(2)
+                display_fn(image, "🟢 Original", col1)
 
-            noise_map = {
-                "Gaussian": ("🌫️ Gaussian", gaussian_img),
-                "Salt & Pepper": ("🧂 Salt & Pepper", sp_img),
-                "Speckle": ("✨ Speckle", speckle_img),
-                "Poisson": ("📊 Poisson", poisson_img),
-            }
-            title, noisy_img = noise_map[noise_option]
-            display_fn(noisy_img, title, col2)
+                noise_map = {
+                    "Gaussian": ("🌫️ Gaussian", gaussian_img),
+                    "Salt & Pepper": ("🧂 Salt & Pepper", sp_img),
+                    "Speckle": ("✨ Speckle", speckle_img),
+                    "Poisson": ("📊 Poisson", poisson_img),
+                }
+                title, noisy_img = noise_map[noise_option]
+                display_fn(noisy_img, title, col2)
 
 # =====================================================================
 # TAB 2 — Filtering Analysis
 # =====================================================================
 with tab2:
-    with st.sidebar:
-        st.markdown("---")
+    col_ctrl, col_display = st.columns([1, 3])
+
+    with col_ctrl:
         with st.container(border=True):
             st.markdown('<div class="sidebar-header">🎯 Noise Type</div>', unsafe_allow_html=True)
             filter_noise_type = st.radio(
@@ -253,64 +256,65 @@ with tab2:
 
         run_button = st.button("▶️ Run Analysis", type="primary", use_container_width=True)
 
-    with st.spinner("Generating noisy image..."):
-        noise_map = {
-            "Gaussian": add_gaussian_noise,
-            "Salt & Pepper": add_salt_pepper_noise,
-            "Speckle": add_speckle_noise,
-            "Poisson": add_poisson_noise,
-        }
-        noisy_img = noise_map[filter_noise_type](image)
+    with col_display:
+        with st.spinner("Generating noisy image..."):
+            noise_map = {
+                "Gaussian": add_gaussian_noise,
+                "Salt & Pepper": add_salt_pepper_noise,
+                "Speckle": add_speckle_noise,
+                "Poisson": add_poisson_noise,
+            }
+            noisy_img = noise_map[filter_noise_type](image)
 
-    if run_button:
-        with st.spinner(f"Applying **{filter_type.capitalize()}** filter ({iterations} iterations)..."):
-            filtered_images, psnr_values, snr_values = analyze_filter(
-                original=image,
-                noisy=noisy_img,
-                filter_name=filter_type,
-                iterations=iterations,
-            )
+        if run_button:
+            with st.spinner(f"Applying **{filter_type.capitalize()}** filter ({iterations} iterations)..."):
+                filtered_images, psnr_values, snr_values = analyze_filter(
+                    original=image,
+                    noisy=noisy_img,
+                    filter_name=filter_type,
+                    iterations=iterations,
+                )
 
-        st.markdown('<div class="section-header">📸 Results</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-header">📸 Results</div>', unsafe_allow_html=True)
 
-        display_fn = display_image_with_histogram if show_histograms else display_image_with_title
+            display_fn = display_image_with_histogram if show_histograms else display_image_with_title
 
-        with st.container(border=True):
-            st.markdown("**Original & Noisy**")
-            col1, col2 = st.columns(2)
-            display_fn(image, "🟢 Original", col1)
-            display_fn(noisy_img, f"📛 Noisy ({filter_noise_type})", col2)
+            with st.container(border=True):
+                st.markdown("**Original & Noisy**")
+                col1, col2 = st.columns(2)
+                display_fn(image, "🟢 Original", col1)
+                display_fn(noisy_img, f"📛 Noisy ({filter_noise_type})", col2)
 
-        st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
 
-        with st.container(border=True):
-            st.markdown(f"**Filtered Images — {filter_type.capitalize()} Filter**")
-            num_filtered = len(filtered_images) - 1
+            with st.container(border=True):
+                st.markdown(f"**Filtered Images — {filter_type.capitalize()} Filter**")
+                num_filtered = len(filtered_images) - 1
 
-            for row_start in range(0, num_filtered, 5):
-                row_end = min(row_start + 5, num_filtered)
-                cols = st.columns(5)
+                for row_start in range(0, num_filtered, 5):
+                    row_end = min(row_start + 5, num_filtered)
+                    cols = st.columns(5)
 
-                for j in range(row_start, row_end):
-                    img_idx = j + 1
-                    display_image_with_metrics(
-                        filtered_images[img_idx],
-                        f"Filter-{img_idx}",
-                        cols[j - row_start],
-                        psnr=psnr_values[j],
-                        snr=snr_values[j],
-                    )
+                    for j in range(row_start, row_end):
+                        img_idx = j + 1
+                        display_image_with_metrics(
+                            filtered_images[img_idx],
+                            f"Filter-{img_idx}",
+                            cols[j - row_start],
+                            psnr=psnr_values[j],
+                            snr=snr_values[j],
+                        )
 
-        st.markdown("<br>", unsafe_allow_html=True)
-        with st.expander("📊 View Metrics Table", expanded=True):
-            df = pd.DataFrame(
-                {
-                    "Iteration": list(range(1, iterations + 1)),
-                    "PSNR (dB)": [f"{v:.2f}" for v in psnr_values],
-                    "SNR (dB)": [f"{v:.2f}" for v in snr_values],
-                }
-            )
-            st.dataframe(df, use_container_width=True, hide_index=True)
+            st.markdown("<br>", unsafe_allow_html=True)
+            with st.expander("📊 View Metrics Table", expanded=True):
+                df = pd.DataFrame(
+                    {
+                        "Iteration": list(range(1, iterations + 1)),
+                        "PSNR (dB)": [f"{v:.2f}" for v in psnr_values],
+                        "SNR (dB)": [f"{v:.2f}" for v in snr_values],
+                    }
+                )
+                st.dataframe(df, use_container_width=True, hide_index=True)
 
-    else:
-        st.info("👈 Configure the settings in the sidebar and click **Run Analysis** to see results.")
+        else:
+            st.info("👈 Configure the settings on the left and click **Run Analysis** to see results.")
