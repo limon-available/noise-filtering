@@ -83,12 +83,12 @@ def get_image_download_link(image: np.ndarray, filename: str, label: str, fmt: s
 
 
 def plot_histogram(image: np.ndarray, title: str = "Histogram") -> np.ndarray:
-    """Plot RGB histogram of an image and return as a NumPy array."""
+    """Plot single grayscale histogram of an image and return as a NumPy array."""
+    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    hist = cv2.calcHist([gray], [0], None, [256], [0, 256])
+
     fig, ax = plt.subplots(figsize=(5, 3))
-    colors = ("red", "green", "blue")
-    for i, color in enumerate(colors):
-        hist = cv2.calcHist([image], [i], None, [256], [0, 256])
-        ax.plot(hist, color=color, alpha=0.8, linewidth=1.5)
+    ax.plot(hist, color="black", alpha=0.8, linewidth=1.5)
     ax.set_title(title, fontsize=10, fontweight="bold")
     ax.set_xlim([0, 256])
     ax.set_xlabel("Pixel Intensity", fontsize=8)
