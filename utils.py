@@ -1,6 +1,7 @@
 import base64
 import io
 import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
 
@@ -60,3 +61,38 @@ def get_image_download_link(image: np.ndarray, filename: str, label: str, fmt: s
     b64 = base64.b64encode(data).decode()
     href = f'<a href="data:image/{fmt};base64,{b64}" download="{filename}" style="text-decoration:none;">{label}</a>'
     return href
+
+
+def plot_histogram(image: np.ndarray, title: str = "Histogram") -> np.ndarray:
+    """Plot RGB histogram of an image and return as a NumPy array."""
+    fig, ax = plt.subplots(figsize=(5, 3))
+    colors = ("red", "green", "blue")
+    for i, color in enumerate(colors):
+        hist = cv2.calcHist([image], [i], None, [256], [0, 256])
+        ax.plot(hist, color=color, alpha=0.8, linewidth=1.5)
+    ax.set_title(title, fontsize=10, fontweight="bold")
+    ax.set_xlim([0, 256])
+    ax.set_xlabel("Pixel Intensity", fontsize=8)
+    ax.set_ylabel("Frequency", fontsize=8)
+    ax.tick_params(labelsize=7)
+    ax.grid(True, alpha=0.3)
+    fig.tight_layout()
+
+    fig.canvas.draw()
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=100, bbox_inches="tight")
+    plt.close(fig)
+    buf.seek(0)
+    img_array = np.frombuffer(buf.getvalue(), dtype=np.uint8)
+    return cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+
+
+def display_image_with_histogram(image: np.ndarray, title: str, col):
+    """Display an image and its histogram side by side in a column."""
+    hist_img = plot_histogram(image, f"{title} Histogram")
+    col.image(image, use_container_width=True)
+    col.markdown(
+        f"<p style='text-align: center; font-weight: bold; font-size: 15px;'>{title}</p>",
+        unsafe_allow_html=True,
+    )
+    col.image(hist_img, use_container_width=True)

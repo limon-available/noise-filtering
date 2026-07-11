@@ -8,7 +8,12 @@ from noise import (
     add_poisson_noise,
 )
 from filtering import analyze_filter
-from utils import load_image, display_image_with_title, display_image_with_metrics
+from utils import (
+    load_image,
+    display_image_with_title,
+    display_image_with_metrics,
+    display_image_with_histogram,
+)
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -109,6 +114,16 @@ with st.sidebar:
         else:
             st.success(f"✅ **{uploaded_file.name}**")
 
+    st.markdown("---")
+    with st.container(border=True):
+        st.markdown('<div class="sidebar-header">📊 Show Histograms</div>', unsafe_allow_html=True)
+        show_histograms = st.checkbox(
+            "Display RGB histograms below images",
+            value=False,
+            label_visibility="collapsed",
+            key="show_histograms",
+        )
+
 # ─────────────────────────────────────────────────────────
 # Load Image
 # ─────────────────────────────────────────────────────────
@@ -157,26 +172,28 @@ with tab1:
 
     st.markdown('<div class="section-header">📸 Results</div>', unsafe_allow_html=True)
 
+    display_fn = display_image_with_histogram if show_histograms else display_image_with_title
+
     if noise_option == "Show All":
         with st.container(border=True):
             st.markdown("**Row 1 — Original & Two Noise Types**")
             col1, col2, col3 = st.columns(3)
-            display_image_with_title(image, "🟢 Original", col1)
-            display_image_with_title(gaussian_img, "🌫️ Gaussian", col2)
-            display_image_with_title(sp_img, "🧂 Salt & Pepper", col3)
+            display_fn(image, "🟢 Original", col1)
+            display_fn(gaussian_img, "🌫️ Gaussian", col2)
+            display_fn(sp_img, "🧂 Salt & Pepper", col3)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
         with st.container(border=True):
             st.markdown("**Row 2 — Two Noise Types**")
             col4, col5 = st.columns(2)
-            display_image_with_title(speckle_img, "✨ Speckle", col4)
-            display_image_with_title(poisson_img, "📊 Poisson", col5)
+            display_fn(speckle_img, "✨ Speckle", col4)
+            display_fn(poisson_img, "📊 Poisson", col5)
 
     else:
         with st.container(border=True):
             col1, col2 = st.columns(2)
-            display_image_with_title(image, "🟢 Original", col1)
+            display_fn(image, "🟢 Original", col1)
 
             noise_map = {
                 "Gaussian": ("🌫️ Gaussian", gaussian_img),
@@ -185,7 +202,7 @@ with tab1:
                 "Poisson": ("📊 Poisson", poisson_img),
             }
             title, noisy_img = noise_map[noise_option]
-            display_image_with_title(noisy_img, title, col2)
+            display_fn(noisy_img, title, col2)
 
 # =====================================================================
 # TAB 2 — Filtering Analysis
@@ -256,11 +273,13 @@ with tab2:
 
         st.markdown('<div class="section-header">📸 Results</div>', unsafe_allow_html=True)
 
+        display_fn = display_image_with_histogram if show_histograms else display_image_with_title
+
         with st.container(border=True):
             st.markdown("**Original & Noisy**")
             col1, col2 = st.columns(2)
-            display_image_with_title(image, "🟢 Original", col1)
-            display_image_with_title(noisy_img, f"📛 Noisy ({filter_noise_type})", col2)
+            display_fn(image, "🟢 Original", col1)
+            display_fn(noisy_img, f"📛 Noisy ({filter_noise_type})", col2)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
